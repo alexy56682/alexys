@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CiboFast - Tu Delivery Favorito</title>
+    <style>
+        :root { --main: #e67e22; --dark: #333; }
+        body { font-family: sans-serif; margin: 0; background: #f4f4f4; }
+        header { background: var(--main); color: white; text-align: center; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .card { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; }
+        button { cursor: pointer; border: none; padding: 8px; border-radius: 4px; width: 100%; margin-top: 5px; }
+        .add-btn { background: #27ae60; color: white; }
+        .cancel-btn { background: #c0392b; color: white; }
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .modal-box { background: white; padding: 20px; border-radius: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="modal">
+    <div class="modal-box">
+        <h2>Bienvenido a CiboFast</h2>
+        <p>Selecciona tu restricción alimentaria:</p>
+        <select id="allergy-select">
+            <option value="none">Sin restricciones</option>
+            <option value="gluten">Sin Gluten (TACC)</option>
+            <option value="lacteos">Sin Lácteos</option>
+            <option value="mariscos">Sin Mariscos</option>
+        </select>
+        <button onclick="startApp()" style="background:var(--main); color:white;">Comenzar a pedir</button>
+    </div>
+</div>
+
+<header><h1>CiboFast</h1></header>
+
+<div class="container">
+    <div class="menu-grid" id="menu"></div>
+    <div style="background: white; padding: 20px; margin-top: 20px; border-radius: 8px;">
+        <h3>Tu Pedido</h3>
+        <ul id="cart"><li>Vacío</li></ul>
+        <p id="total">Total: $0</p>
+        <button class="cancel-btn" onclick="clearCart()">Cancelar Pedido</button>
+    </div>
+</div>
+
+<script>
+    const products = [
+        { n: "Hamburguesa Doble", p: 8500, a: "gluten", i: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" },
+        { n: "Pizza Pepperoni", p: 9500, a: "lacteos", i: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300" },
+        { n: "Sushi California", p: 7500, a: "mariscos", i: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=300" },
+        { n: "Ensalada Griega", p: 5500, a: "none", i: "https://images.unsplash.com/photo-1505253716362-afae1f3c2b10?w=300" },
+        { n: "Tacos de Carne", p: 6800, a: "none", i: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300" },
+        { n: "Lasagna Boloñesa", p: 8900, a: "lacteos", i: "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=300" },
+        { n: "Ceviche Mixto", p: 11000, a: "mariscos", i: "https://images.unsplash.com/photo-1535400255456-984241433b21?w=300" },
+        { n: "Helado Vainilla", p: 3500, a: "lacteos", i: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300" },
+        { n: "Papas Rústicas", p: 4000, a: "none", i: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300" },
+        { n: "Pollo Teriyaki", p: 9200, a: "gluten", i: "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=300" }
+    ];
+
+    let cart = [], allergy = "";
+
+    function startApp() {
+        allergy = document.getElementById("allergy-select").value;
+        document.getElementById("modal").style.display = "none";
+        render();
+    }
+
+    function render() {
+        const m = document.getElementById("menu");
+        m.innerHTML = products.filter(p => p.a !== allergy).map(p => `
+            <div class="card">
+                <img src="${p.i}">
+                <h4>${p.n}</h4>
+                <p>$${p.p}</p>
+                <button class="add-btn" onclick="add('${p.n}', ${p.p})">Añadir</button>
+            </div>
+        `).join('');
+    }
+
+    function add(n, p) {
+        cart.push({ n, p });
+        updateCart();
+    }
+
+    function clearCart() {
+        cart = [];
+        updateCart();
+    }
+
+    function updateCart() {
+        const c = document.getElementById("cart");
+        c.innerHTML = cart.length ? cart.map(i => `<li>${i.n} - $${i.p}</li>`).join('') : "<li>Vacío</li>";
+        document.getElementById("total").innerText = "Total: $" + cart.reduce((s, i) => s + i.p, 0);
+    }
+</script>
+</body>
+</html>
